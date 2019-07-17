@@ -1,8 +1,13 @@
-// Plotclock on nodemcu-32s
-// Base on Johannes Heberlein 2014,
-// v 0.5
+// Plotclock
+// cc - by Johannes Heberlein 2014
+// v 1.02
+// thingiverse.com/joo   wiki.fablab-nuernberg.de
+
+// PlotClock_zoomIn_LOT on nodemcu-32s
+// Base on Plotclock
 // Wong NingChi   https://www.instructables.com/member/wnq/instructables/
-//
+// English: https://www.instructables.com/id/PlotClockzoomInLOT/
+// chinese: https://create.arduino.cc/projecthub/flyingPig507/plotclock-lot-7f5ac4
 
 #include <Arduino.h>
 #include <ESP32Servo.h>
@@ -10,7 +15,7 @@
 #include <WiFiUdp.h>
 #include <WiFi.h>
 
-#define CALIBRATION      // enable calibration mode
+#define CALIBRATION // enable calibration mode
 // When in calibration mode, adjust the following factor until the servos move exactly 90 degrees
 #define SERVOFAKTORLEFT 700
 #define SERVOFAKTORRIGHT 700
@@ -19,9 +24,9 @@
 // When in calibration mode, adjust the NULL-values so that the servo arms are at all times parallel
 // either to the X or Y axis
 #define SERVOLEFTNULL 1800
-#define SERVORIGHTNULL 700
+#define SERVORIGHTNULL 570
 
-#define SERVOPINLIFT 1
+#define SERVOPINLIFT 21
 #define SERVOPINLEFT 23
 #define SERVOPINRIGHT 22
 
@@ -37,11 +42,13 @@
 #define O2Y -80
 
 // lift positions of lifting servo
-#define LIFT0 1080 // on drawing surface
-#define LIFT1 925  // between numbers
-#define LIFT2 725  // going towards sweeper
+#define LIFT0 1500 // on drawing surface
+#define LIFT1 1300  // between numbers
+#define LIFT2 1000  // going towards sweeper
+
 // speed of liftimg arm, higher is slower
-#define LIFTSPEED 1500
+//#define LIFTSPEED 1500
+#define LIFTSPEED 2
 
 int servoLift = 1500;
 
@@ -56,25 +63,30 @@ volatile double lastX = darwAreaWidth;
 volatile double lastY = darwAreaHeight;
 
 // NTP
-const char *ssid = "DETAOSTF";
-const char *password = "detaostaff";
+const char *ssid = "your_wifi_name";
+const char *password = "your_wifi_password";
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "cn.pool.ntp.org", 28800); //offset is china +8, 8h*60m*60s
 //NTPClient timeClient(ntpUDP);
 
 //path of move
 const int rows = 3;
-const int _path_max = 8;
+const int _path_max = 4;
 int _path_of_move[_path_max][rows] = {
-    {0, 0, 0},
-    {50, 0, 0},
-    {100, 0, 0},
-    {50, 0, 0},
-    {1, 1, 0},
-    {0, 0, 0},
-    {1, 1, 0},
-    {0, 0, 0}
-  };
+    {60, 50, 0},
+    {80, 50, 0},
+    {60, 80, 0},
+    {30, 80, 0}
+    };
+
+// best area of playform, 4 corner
+/* int _path_of_move[_path_max][rows] = {
+    {40, 30, 0},    //left up
+    {110, 30, 1},   //right up
+    {150, 100, 2},  //right down
+    {0, 100, 1}     //left down
+    };
+ */
 
 int _alarm_H_1 = 7;
 int _alarm_M_1 = 59;
@@ -252,7 +264,7 @@ void setup()
   servo3.attach(SERVOPINRIGHT); //  right servo
 #ifdef CALIBRATION
 
-#else 
+#else
   WiFi.begin(ssid, password);
   Serial.print("Wifi connecting ");
   while (WiFi.status() != WL_CONNECTED)
@@ -270,19 +282,20 @@ void setup()
 
 void loop()
 {
-  
+
 #ifdef CALIBRATION
-
   // Servohorns will have 90° between movements, parallel to x and y axis
-  drawTo(0, darwAreaHeight*0.6);
+  /* drawTo(0, darwAreaHeight * 0.6);
   delay(1000);
-  drawTo(darwAreaWidth, darwAreaHeight*0.6);
-  delay(1000);
+  drawTo(darwAreaWidth, darwAreaHeight * 0.6);
+  delay(1000); */
 
-#else 
   moveArm(); //test
 
-  timeClient.update(); //need check wifi is OK?
+#else
+  
+
+   timeClient.update(); //need check wifi is OK?
   // Serial.print("time : ");
   // Serial.println(timeClient.getFormattedTime());
   // Serial.print("day : ");
@@ -321,6 +334,6 @@ void loop()
       moveArm();
       _isAlarm_2 = true;
     }
-  }
-  #endif
+  } 
+#endif
 }
