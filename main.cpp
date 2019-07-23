@@ -71,12 +71,31 @@ NTPClient timeClient(ntpUDP, "cn.pool.ntp.org", 28800); //offset is china +8, 8h
 
 //path of move
 const int rows = 3;
-const int _path_max = 4;
+const int _path_max = 23;
 int _path_of_move[_path_max][rows] = {
-    {60, 50, 0},
-    {80, 50, 0},
-    {60, 80, 0},
-    {30, 80, 0}
+    {35, 80, 1},
+    {35, 80, 1},
+    {35, 80, 1},
+    {35, 80, 1},
+    {35, 80, 1},
+    {35, 80, 0},
+    {35, 80, 1},
+    {45, 80, 1},
+    {45, 80, 0},
+    {45, 80, 1},
+    {100, 90, 1},
+    {100, 90, 1},
+    {100, 90, 1},
+    {100, 90, 1},
+    {100, 90, 1},
+    {100, 90, 1},
+    {100, 90, 0},
+    {100, 90, 1},
+    {100, 90, 1},
+    {100, 90, 1},
+    {110, 57, 1},
+    {110, 57, 0},
+    {110, 57, 1}
     };
 
 // best area of playform, 4 corner
@@ -161,7 +180,7 @@ void drawTo(double pX, double pY)
   lastY = pY;
 }
 
-void lift(char lift)
+/* void lift(char lift)
 {
   switch (lift)
   {
@@ -235,6 +254,21 @@ void lift(char lift)
     }
     break;
   }
+} */
+
+void lift(char lift)
+{
+  switch (lift)
+  {
+  case 0: 
+    servo1.write(10);
+    break;
+
+  case 1: //150
+     servo1.write(0);
+    break;
+
+  }
 }
 
 void moveArm()
@@ -243,7 +277,15 @@ void moveArm()
   {
     drawTo(_path_of_move[i][0], _path_of_move[i][1]);
     lift(_path_of_move[i][2]);
-    delay(1000);
+    if(_path_of_move[i][2] == 0){
+      delay(500);
+    }else
+    {
+      delay(1000);
+    }
+    
+    
+    
   }
 }
 
@@ -288,7 +330,7 @@ void loop()
   /* drawTo(0, darwAreaHeight * 0.6);
   delay(1000);
   drawTo(darwAreaWidth, darwAreaHeight * 0.6);
-  delay(1000); */
+  delay(1000);  */
 
   moveArm(); //test
 
